@@ -77,6 +77,13 @@ async function run() {
     const newAssignment = req.body;
     const result = await assignments.insertOne(newAssignment);
     res.send(result);
+
+    app.delete('/study-buddies/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await assignments.deleteOne(query);
+      res.send(result);
+    })
 })
 
     // Send a ping to confirm a successful connection
