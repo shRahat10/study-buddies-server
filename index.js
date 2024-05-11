@@ -47,7 +47,7 @@ async function run() {
     // await client.connect();
 
     //creating Token
-    app.post("/jwt", logger, async (req, res) => {
+    app.post("/jwt", async (req, res) => {
       const user = req.body;
       console.log("user for token", user);
       const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET);
@@ -65,26 +65,26 @@ async function run() {
     });
 
     //crud operations
-    const assignments = client.db('studyBuddies').collection('assignments');
+    const assignments = client.db('study-buddies').collection('assignments');
 
     app.get('/study-buddies', async (req, res) => {
-      const cursor = spotCollection.find();
+      const cursor = assignments.find();
       const result = await cursor.toArray();
       res.send(result);
-  })
-
-  app.post('/study-buddies', async (req, res) => {
-    const newAssignment = req.body;
-    const result = await assignments.insertOne(newAssignment);
-    res.send(result);
-
-    app.delete('/study-buddies/:id', async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: new ObjectId(id) }
-      const result = await assignments.deleteOne(query);
-      res.send(result);
     })
-})
+
+    app.post('/study-buddies', async (req, res) => {
+      const newAssignment = req.body;
+      const result = await assignments.insertOne(newAssignment);
+      res.send(result);
+
+      app.delete('/study-buddies/:id', async (req, res) => {
+        const id = req.params.id;
+        const query = { _id: new ObjectId(id) }
+        const result = await assignments.deleteOne(query);
+        res.send(result);
+      })
+    })
 
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
