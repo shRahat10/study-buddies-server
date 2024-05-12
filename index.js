@@ -64,7 +64,7 @@ async function run() {
         .send({ success: true });
     });
 
-    //crud operations
+    //crud operations for assignments
     const assignments = client.db('study-buddies').collection('assignments');
 
     app.get('/study-buddies', async (req, res) => {
@@ -104,6 +104,15 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) }
       const result = await assignments.deleteOne(query);
+      res.send(result);
+    })
+
+    //crud operations for submissions
+    const submissions = client.db('study-buddies').collection('submissions');
+
+    app.get('/submissions', async (req, res) => {
+      const cursor = submissions.find();
+      const result = await cursor.toArray();
       res.send(result);
     })
 
