@@ -110,7 +110,11 @@ async function run() {
     //crud operations for submissions
     const submissions = client.db('study-buddies').collection('submissions');
 
-    
+    app.get('/submissions', async (req, res) => {
+      const cursor = submissions.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    })
 
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
