@@ -19,6 +19,27 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
+const logger = (req, res, next) => {
+  console.log('log info: ', req.method, req.url);
+  next();
+}
+
+const verifyToken = (req, res, next) => {
+  const token = req?.cookies?.token;
+
+  if(!token){
+    return res.status(401).send({message: 'unauthorized access'})
+  }
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(401).send({message: 'unauthorized access'})
+    }
+    req.user = decoded;
+    next();
+  })
+}
+//===========
+
 
 app.get('/', (req, res) => {
   res.send("Server is running")
@@ -112,7 +133,7 @@ async function run() {
     //crud operations for submissions
     const submissions = client.db('study-buddies').collection('submissions');
 
-    app.get('/submissions', async (req, res) => {
+    app.get('/submissions', logger, verifyToken, async (req, res) => {
       const cursor = submissions.find();
       const result = await cursor.toArray();
       res.send(result);
