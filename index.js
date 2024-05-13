@@ -131,7 +131,7 @@ async function run() {
       const spot = {
         $set: {
           status: updatedMarking.status,
-          gottenMarks: updatedMarking.gottenMarks,
+          obtainedMarks: updatedMarking.obtainedMarks,
           feedback: updatedMarking.feedback,
         }
       }
