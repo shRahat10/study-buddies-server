@@ -28,12 +28,12 @@ const logger = (req, res, next) => {
 const verifyToken = (req, res, next) => {
   const token = req.cookies?.token
   console.log('token verify', token);
-  if(!token){
-    return res.status(401).send({message: 'unauthorized access'})
+  if (!token) {
+    return res.status(401).send({ message: 'unauthorized access' })
   }
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
     if (err) {
-      return res.status(401).send({message: 'unauthorized access'})
+      return res.status(401).send({ message: 'unauthorized access' })
     }
     req.user = decoded;
     next();
@@ -72,13 +72,18 @@ async function run() {
 
     //creating Token
     app.post("/jwt", async (req, res) => {
-      const user = req.body;
-      console.log("user for token", user);
-      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET,{
-        expiresIn: '1h'
-      });
+      try {
+        const user = req.body;
+        console.log("user for token", user);
+        const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+          expiresIn: '1h'
+        });
 
-      res.cookie("token", token, cookieOptions).send({ success: true });
+        res.cookie("token", token, cookieOptions)
+          .send({ success: true });
+      } catch (error) {
+        res.status(500).send({ success: false })
+      }
     });
 
     //clearing Token
@@ -134,7 +139,7 @@ async function run() {
     })
 
     //crud operations for submissions
-    
+
     const submissions = client.db('study-buddies').collection('submissions');
 
     app.get('/submissions', logger, verifyToken, async (req, res) => {
@@ -143,13 +148,13 @@ async function run() {
       res.send(result);
     })
 
-    app.post('/submissions', async (req, res) => {
+    app.post('/submissions', logger, verifyToken, async (req, res) => {
       const newSubmissions = req.body;
       const result = await submissions.insertOne(newSubmissions);
       res.send(result);
     })
 
-    app.put('/submissions/:id', async (req, res) => {
+    app.put('/submissions/:id', logger, verifyToken, async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) }
       const options = { upsert: true };
